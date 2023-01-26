@@ -1,4 +1,4 @@
-package me.kalok.busgotlost;
+package me.kalok.busgotlost.service;
 
 import me.kalok.busgotlost.model.ListResult;
 import me.kalok.busgotlost.model.Stop;
@@ -7,23 +7,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.logging.Logger;
 
-@RestController
-public class ApiConsumer {
-    private final Logger LOG = Logger.getLogger(String.valueOf(ApiConsumer.class));
+@Service
+public class ApiConsumerServiceImpl implements ApiConsumerService {
+    private final Logger LOG = Logger.getLogger(String.valueOf(ApiConsumerServiceImpl.class));
     @Autowired
     RestTemplate restTemplate;
 
     @Value("${api.url}")
     String apiUrl;
 
-    @GetMapping("eta")
     public ListResult<Stop> getStopList() {
         return restTemplate.exchange(
                 apiUrl + "v1/transport/kmb/stop",
@@ -34,8 +31,7 @@ public class ApiConsumer {
         ).getBody();
     }
 
-    @GetMapping("stopEta/{stopId}")
-    public ListResult<StopEta> getStopEta(@PathVariable("stopId") String stopId) {
+    public ListResult<StopEta> getStopEta(String stopId) {
         LOG.info("Calling " + apiUrl + "v1/transport/kmb/stop-eta/" + stopId);
         return restTemplate.exchange(
                 apiUrl + "v1/transport/kmb/stop-eta/" + stopId,

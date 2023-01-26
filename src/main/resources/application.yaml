@@ -1,0 +1,4 @@
+server:
+  port: 8082
+api:
+  url: https://data.etabus.gov.hk/

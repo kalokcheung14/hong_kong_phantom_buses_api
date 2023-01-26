@@ -20,11 +20,6 @@ public class ApiConsumer {
     @Value("${api.url}")
     String apiUrl;
 
-    @GetMapping("/error")
-    public String index() {
-        return "Invalid";
-    }
-
     @GetMapping("eta")
     public Object getEta() {
         HttpHeaders headers = new HttpHeaders();

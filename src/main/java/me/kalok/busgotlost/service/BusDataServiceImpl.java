@@ -1,8 +1,7 @@
 package me.kalok.busgotlost.service;
 
-import me.kalok.busgotlost.model.ListResult;
-import me.kalok.busgotlost.model.Stop;
-import me.kalok.busgotlost.model.StopEta;
+import me.kalok.busgotlost.model.*;
+import me.kalok.busgotlost.util.DistanceUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -13,10 +12,13 @@ import org.springframework.web.client.RestTemplate;
 import java.util.logging.Logger;
 
 @Service
-public class ApiConsumerServiceImpl implements ApiConsumerService {
-    private final Logger LOG = Logger.getLogger(String.valueOf(ApiConsumerServiceImpl.class));
+public class BusDataServiceImpl implements BusDataService {
+    private final Logger LOG = Logger.getLogger(String.valueOf(BusDataServiceImpl.class));
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    DistanceUtil distanceUtil;
 
     @Value("${api.url}")
     String apiUrl;
@@ -40,5 +42,28 @@ public class ApiConsumerServiceImpl implements ApiConsumerService {
                 new ParameterizedTypeReference<ListResult<StopEta>>() {
                 }
         ).getBody();
+    }
+
+    @Override
+    public EtaResponse getStopEtaResponse(Coordinate coordinate) {
+        ListResult<Stop> stopList = getStopList();
+
+        double shortestDistance = -1;
+        Stop nearestStop = null;
+        for (Stop stop: stopList.data()) {
+            Coordinate coordinate2 = new Coordinate(
+                    Double.parseDouble(stop.latitude()),
+                    Double.parseDouble(stop.longitude())
+            );
+            double distance = distanceUtil.calculateDistance(coordinate, coordinate2);
+
+            if (shortestDistance == -1 || distance < shortestDistance) {
+                shortestDistance = distance;
+                nearestStop = stop;
+            }
+        }
+
+        assert nearestStop != null;
+        return new EtaResponse(nearestStop.nameEn(), nearestStop.nameTc(), null);
     }
 }

@@ -23,7 +23,7 @@ public class BusDataServiceImpl implements BusDataService {
     @Value("${api.url}")
     String apiUrl;
 
-    public ListResult<Stop> getStopList() {
+    private ListResult<Stop> getStopList() {
         return restTemplate.exchange(
                 apiUrl + "v1/transport/kmb/stop",
                 HttpMethod.GET,
@@ -33,7 +33,7 @@ public class BusDataServiceImpl implements BusDataService {
         ).getBody();
     }
 
-    public ListResult<StopEta> getStopEta(String stopId) {
+    private ListResult<StopEta> getStopEta(String stopId) {
         LOG.info("Calling " + apiUrl + "v1/transport/kmb/stop-eta/" + stopId);
         return restTemplate.exchange(
                 apiUrl + "v1/transport/kmb/stop-eta/" + stopId,

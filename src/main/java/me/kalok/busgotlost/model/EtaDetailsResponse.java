@@ -1,7 +1,7 @@
 package me.kalok.busgotlost.model;
 
 public record EtaDetailsResponse(
-        String time,
+        Long time,
         String remarkEn,
         String remarkTc
 ) {

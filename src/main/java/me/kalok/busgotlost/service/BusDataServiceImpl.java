@@ -87,7 +87,7 @@ public class BusDataServiceImpl implements BusDataService {
         // Get a list of ETA by stop ID
         ListResult<StopEta> stopEtaList = getStopEta(nearestStop.stopId());
         // Create a hashmap to group ETA of different routes
-        HashMap<String, ArrayList<EtaDetailsResponse>> stopEtaMap = new HashMap<>();
+        HashMap<String, EtaBusRouteResponse> stopEtaMap = new HashMap<>();
 
         // Convert date string to LocalDateTime object
         // This is called "ISO format"
@@ -98,22 +98,33 @@ public class BusDataServiceImpl implements BusDataService {
 
         // Loop through all the stop ETA items and group them by routes
         for (StopEta stopEta: stopEtaList.data()) {
-            ArrayList<EtaDetailsResponse> etaDetailsList;
+            EtaBusRouteResponse etaBusRouteResponse;
             String route = stopEta.route();
-            // Store ETA items of the same route in the same ArrayList
+            // Store ETA items of the same route in the same EtaBusRouteResponse
             if (!stopEtaMap.containsKey(route)) {
-                etaDetailsList = new ArrayList<>();
+                // If the key route is not in the map
+                // create a new EtaBusRouteResponse instance
+                etaBusRouteResponse = new EtaBusRouteResponse(
+                        route,
+                        stopEta.destEn(),
+                        stopEta.destTc(),
+                        new ArrayList<>()
+                );
+                // Put the newly created EtaBusRouteResponse into the map
+                stopEtaMap.put(route, etaBusRouteResponse);
             } else {
-                etaDetailsList = stopEtaMap.get(route);
+                // If the EtaBusRouteResponse instance is already in the map for this route
+                // get it from the map
+                etaBusRouteResponse = stopEtaMap.get(route);
             }
 
-            String etaResult = null;
+            Long etaResult = null;
 
             if (stopEta.eta() != null) {
                 // Calculate ETA in minutes if it is not null
                 // by comparing the difference between the generated timestamp of the API call
                 // and the ETA timestamp
-                etaResult = String.valueOf(
+                etaResult =
                     Duration.between(
                         date,
                         // Parse stop ETA time by ISO date time format
@@ -121,18 +132,15 @@ public class BusDataServiceImpl implements BusDataService {
                             stopEta.eta(),
                             DateTimeFormatter.ISO_DATE_TIME
                         )
-                    ).toMinutes()
-                );
+                    ).toMinutes();
             }
 
             // Add ETA details item to corresponding list
-            etaDetailsList.add(new EtaDetailsResponse(
+            etaBusRouteResponse.getEtaDetails().add(new EtaDetailsResponse(
                 etaResult,
                 stopEta.rmkEn(),
                 stopEta.rmkTc()
             ));
-            // Put the updated list into the map
-            stopEtaMap.put(route, etaDetailsList);
         }
 
         return new EtaResponse(
@@ -140,10 +148,8 @@ public class BusDataServiceImpl implements BusDataService {
             DateTimeFormatter.ofPattern("HH:mm:ss").format(date),
             nearestStop.nameEn(),
             nearestStop.nameTc(),
-            // Format each ETA list of a route
-            stopEtaMap.keySet().stream().map(
-                    s -> new EtaBusRouteResponse(s, stopEtaMap.get(s))
-            ).toList()
+            // Return the values of the map as a list
+            stopEtaMap.values().stream().toList()
         );
     }
 }

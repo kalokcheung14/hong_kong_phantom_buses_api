@@ -6,7 +6,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DistanceUtilImpl implements DistanceUtil {
 
-    // Haversine formula
+    // Haversine formula to calculate distance between two geo coordinates
+    // Reference: https://www.movable-type.co.uk/scripts/latlong.html
     @Override
     public double calculateDistance(Coordinate coordinate1, Coordinate coordinate2) {
         double lat1 = coordinate1.latitude();

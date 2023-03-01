@@ -9,16 +9,26 @@ public final class EtaBusRouteResponse {
     private final String destTc;
     private ArrayList<EtaDetailsResponse> etaDetails;
 
+    private final String updateTime;
+    private final String stopNameEn;
+    private final String stopNameTc;
+
     public EtaBusRouteResponse(
             String route,
             String destEn,
             String destTc,
-            ArrayList<EtaDetailsResponse> etaDetails
+            ArrayList<EtaDetailsResponse> etaDetails,
+            String updateTime,
+            String stopNameEn,
+            String stopNameTc
     ) {
         this.route = route;
         this.destEn = destEn;
         this.destTc = destTc;
         this.etaDetails = etaDetails;
+        this.updateTime = updateTime;
+        this.stopNameEn = stopNameEn;
+        this.stopNameTc = stopNameTc;
     }
 
     public String getRoute() {

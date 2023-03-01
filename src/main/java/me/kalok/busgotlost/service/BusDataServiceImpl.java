@@ -9,7 +9,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.ParseException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,6 +17,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 public class BusDataServiceImpl implements BusDataService {
@@ -31,19 +31,20 @@ public class BusDataServiceImpl implements BusDataService {
     @Value("${api.url}")
     String apiUrl;
 
-    private final int NUM_OF_NEAREST_STOPS = 3;
+    @Value("${api.numOfStopsToDisplay}")
+    Integer numberOfStopsToDisplay;
 
     @Override
-    public List<EtaResponse> getStopEtaResponse(Coordinate coordinate) throws ParseException {
+    public List<EtaResponse> getStopEtaResponse(Coordinate coordinate) {
         // Get list of bus stops
         ListResult<Stop> stopList = getStopList();
 
         // Find the nearest stop to the provided coordinate
         // by calculating the distance between the coordinate and all the stops
-        List<Stop> nearestStops = getNearestStops(coordinate, stopList, NUM_OF_NEAREST_STOPS);
+        List<Stop> nearestStops = getNearestStops(coordinate, stopList, numberOfStopsToDisplay);
 
         // Get ETA response list of stops
-        return nearestStops.stream().map(this::getEtaResponse).toList();
+        return nearestStops.stream().map(this::getEtaResponse).toList().stream().flatMap(List::stream).toList();
     }
 
     /**
@@ -74,7 +75,7 @@ public class BusDataServiceImpl implements BusDataService {
     /**
      * Encapsulate a ETA Response of a bus stop
      */
-    private EtaResponse getEtaResponse(Stop nearestStop) {
+    private List<EtaBusRouteResponse> getEtaResponse(Stop nearestStop) {
         // Get a list of ETA by stop ID
         ListResult<StopEta> stopEtaList = getStopEta(nearestStop.getStopId());
 
@@ -86,22 +87,21 @@ public class BusDataServiceImpl implements BusDataService {
         );
 
         // Get a hashmap of EtaBusRouteResponse with routes as key
-        HashMap<String, EtaBusRouteResponse> stopEtaMap = getStringEtaBusRouteResponseHashMap(stopEtaList, date);
 
-        return new EtaResponse(
-                // This format is used to display the generated time to the user
-                DateTimeFormatter.ofPattern("HH:mm:ss").format(date),
-                nearestStop.getNameEn(),
-                nearestStop.getNameTc(),
-                // Return the values of the map as a list
-                stopEtaMap.values().stream().toList()
-        );
+        return getStringEtaBusRouteResponseHashMap(stopEtaList, date, nearestStop);
     }
 
     /**
      * Get a hashmap of EtaBusRouteResponse with routes as key
      */
-    private static HashMap<String, EtaBusRouteResponse> getStringEtaBusRouteResponseHashMap(ListResult<StopEta> stopEtaList, LocalDateTime date) {
+    private static List<EtaBusRouteResponse> getStringEtaBusRouteResponseHashMap(
+            ListResult<StopEta> stopEtaList,
+            LocalDateTime date,
+            Stop stop
+    ) {
+        // This format is used to display the generated time to the user
+        String updateTime = DateTimeFormatter.ofPattern("HH:mm:ss").format(date);
+
         // Create a hashmap to group ETA of different routes
         HashMap<String, EtaBusRouteResponse> stopEtaMap = new HashMap<>();
 
@@ -117,7 +117,10 @@ public class BusDataServiceImpl implements BusDataService {
                         route,
                         stopEta.destEn(),
                         stopEta.destTc(),
-                        new ArrayList<>()
+                        new ArrayList<>(),
+                        updateTime,
+                        stop.getNameEn(),
+                        stop.getNameTc()
                 );
                 // Put the newly created EtaBusRouteResponse into the map
                 stopEtaMap.put(route, etaBusRouteResponse);
@@ -134,7 +137,7 @@ public class BusDataServiceImpl implements BusDataService {
                 stopEta.rmkTc()
             ));
         }
-        return stopEtaMap;
+        return stopEtaMap.values().stream().toList();
     }
 
     /**

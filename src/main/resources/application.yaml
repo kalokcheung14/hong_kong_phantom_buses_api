@@ -6,3 +6,4 @@ server:
     path: /error
 api:
   url: https://data.etabus.gov.hk/
+  numOfStopsToDisplay: 3

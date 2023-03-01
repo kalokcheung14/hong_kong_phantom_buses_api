@@ -22,7 +22,7 @@ public class BusGotLostApplication {
 	@Bean
 	public RestTemplate getRestTemplate() {
 		final RestTemplate restTemplate = new RestTemplate();
-		List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
+		List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
 
 		// Add the Jackson Message Converter to map JSON object
 		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();

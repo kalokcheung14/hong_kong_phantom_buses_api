@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
+import java.util.List;
 import java.util.logging.Logger;
 
 @RestController
@@ -19,7 +20,7 @@ public class MainController {
     private BusDataService busDataService;
 
     @GetMapping("/eta")
-    public EtaResponse getEta(@RequestParam("coordinate") String coordinate) throws ParseException {
+    public List<EtaResponse> getEta(@RequestParam("coordinate") String coordinate) throws ParseException {
         // Split input coordinates by comer
         String[] coords = coordinate.split(",");
         // Convert to double

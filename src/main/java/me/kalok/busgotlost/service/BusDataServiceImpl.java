@@ -52,8 +52,10 @@ public class BusDataServiceImpl implements BusDataService {
      * Get the full list of bus stops
      */
     private ListResult<Stop> getStopList() {
+        String requestUrl = apiUrl + "v1/transport/kmb/stop";
+        LOG.info("Calling " + requestUrl);
         return restTemplate.exchange(
-            apiUrl + "v1/transport/kmb/stop",
+            requestUrl,
             HttpMethod.GET,
             null,
             new ParameterizedTypeReference<ListResult<Stop>>() {}
@@ -64,9 +66,10 @@ public class BusDataServiceImpl implements BusDataService {
      * Get a list of ETA by passing the stop ID String
      */
     private ListResult<StopEta> getStopEta(String stopId) {
-        LOG.info("Calling " + apiUrl + "v1/transport/kmb/stop-eta/" + stopId);
+        String requestUrl = apiUrl + "v1/transport/kmb/stop-eta/" + stopId;
+        LOG.info("Calling " + requestUrl);
         return restTemplate.exchange(
-            apiUrl + "v1/transport/kmb/stop-eta/" + stopId,
+            requestUrl,
             HttpMethod.GET,
             null,
             new ParameterizedTypeReference<ListResult<StopEta>>() {}
@@ -74,7 +77,7 @@ public class BusDataServiceImpl implements BusDataService {
     }
 
     /**
-     * Encapsulate a ETA Response of a bus stop
+     * Encapsulate an ETA Response of a bus stop
      */
     private List<EtaBusRouteResponse> getEtaResponse(Stop nearestStop) {
         // Get a list of ETA by stop ID
@@ -88,13 +91,13 @@ public class BusDataServiceImpl implements BusDataService {
         );
 
         // Get a list of EtaBusRouteResponse
-        return getStringEtaBusRouteResponseHashMap(stopEtaList, date, nearestStop);
+        return getStringEtaBusRouteResponseList(stopEtaList, date, nearestStop);
     }
 
     /**
-     * Get a hashmap of EtaBusRouteResponse with routes as key
+     * Get a list of EtaBusRouteResponse with routes as key
      */
-    private static List<EtaBusRouteResponse> getStringEtaBusRouteResponseHashMap(
+    private static List<EtaBusRouteResponse> getStringEtaBusRouteResponseList(
             ListResult<StopEta> stopEtaList,
             LocalDateTime date,
             Stop stop
@@ -105,8 +108,13 @@ public class BusDataServiceImpl implements BusDataService {
         // Create a hashmap to group ETA of different routes
         HashMap<String, EtaBusRouteResponse> stopEtaMap = new HashMap<>();
 
-        // Loop through all the stop ETA items and group them by routes
-        for (StopEta stopEta: stopEtaList.data()) {
+        // Loop through all the stop ETA items in which their eta are not null and group them by routes
+        List<StopEta> stopEtas = stopEtaList.data()
+                .stream()
+                .filter(stopEta -> stopEta.eta() != null)
+                .toList();
+
+        for (StopEta stopEta: stopEtas) {
             EtaBusRouteResponse etaBusRouteResponse;
             String route = stopEta.route();
             // Store ETA items of the same route in the same EtaBusRouteResponse
@@ -114,13 +122,13 @@ public class BusDataServiceImpl implements BusDataService {
                 // If the key route is not in the map
                 // create a new EtaBusRouteResponse instance
                 etaBusRouteResponse = new EtaBusRouteResponse(
+                        updateTime,
                         route,
                         stopEta.destEn(),
                         stopEta.destTc(),
-                        new ArrayList<>(),
-                        updateTime,
                         stop.getNameEn(),
-                        stop.getNameTc()
+                        stop.getNameTc(),
+                        new ArrayList<>()
                 );
                 // Put the newly created EtaBusRouteResponse into the map
                 stopEtaMap.put(route, etaBusRouteResponse);
@@ -131,11 +139,13 @@ public class BusDataServiceImpl implements BusDataService {
             }
 
             // Add ETA details item to corresponding list
-            etaBusRouteResponse.getEtaDetails().add(new EtaDetailsResponse(
-                getEtaInMinutes(date, stopEta),
-                stopEta.rmkEn(),
-                stopEta.rmkTc()
-            ));
+            if (etaBusRouteResponse.etaDetails().size() < 3) {
+                etaBusRouteResponse.etaDetails().add(new EtaDetailsResponse(
+                        getEtaInMinutes(date, stopEta),
+                        stopEta.rmkEn(),
+                        stopEta.rmkTc()
+                ));
+            }
         }
         return stopEtaMap.values().stream().toList();
     }

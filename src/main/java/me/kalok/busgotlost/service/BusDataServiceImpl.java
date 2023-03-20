@@ -12,12 +12,8 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 @Service
 public class BusDataServiceImpl implements BusDataService {
@@ -35,7 +31,7 @@ public class BusDataServiceImpl implements BusDataService {
     Integer numberOfStopsToDisplay;
 
     @Override
-    public List<EtaResponse> getStopEtaResponse(Coordinate coordinate) {
+    public EtaResponse getStopEtaResponse(Coordinate coordinate) {
         // Get list of bus stops
         ListResult<Stop> stopList = getStopList();
 
@@ -44,7 +40,12 @@ public class BusDataServiceImpl implements BusDataService {
         List<Stop> nearestStops = getNearestStops(coordinate, stopList, numberOfStopsToDisplay);
 
         // Get ETA response list of stops
-        return nearestStops.stream().map(this::getEtaResponse).toList().stream().flatMap(List::stream).toList();
+        return new EtaResponse(
+                nearestStops.stream()
+                        .map(this::getEtaResponse)
+                        .flatMap(List::stream)
+                        .toList()
+        );
     }
 
     /**
@@ -86,8 +87,7 @@ public class BusDataServiceImpl implements BusDataService {
             DateTimeFormatter.ISO_DATE_TIME
         );
 
-        // Get a hashmap of EtaBusRouteResponse with routes as key
-
+        // Get a list of EtaBusRouteResponse
         return getStringEtaBusRouteResponseHashMap(stopEtaList, date, nearestStop);
     }
 

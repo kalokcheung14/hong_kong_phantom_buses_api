@@ -6,5 +6,5 @@ import java.text.ParseException;
 import java.util.List;
 
 public interface BusDataService {
-    List<EtaResponse> getStopEtaResponse(Coordinate coordinate) throws ParseException;
+    EtaResponse getStopEtaResponse(Coordinate coordinate) throws ParseException;
 }

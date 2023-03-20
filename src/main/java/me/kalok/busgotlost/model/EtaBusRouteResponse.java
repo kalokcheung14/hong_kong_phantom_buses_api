@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public final class EtaBusRouteResponse {
+    private final String updateTime;
     private final String route;
     private final String destEn;
     private final String destTc;
-    private ArrayList<EtaDetailsResponse> etaDetails;
-
-    private final String updateTime;
     private final String stopNameEn;
     private final String stopNameTc;
+    private ArrayList<EtaDetailsResponse> etaDetails;
 
     public EtaBusRouteResponse(
             String route,
@@ -49,6 +48,18 @@ public final class EtaBusRouteResponse {
 
     public void setEtaDetails(ArrayList<EtaDetailsResponse> etaDetails) {
         this.etaDetails = etaDetails;
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public String getStopNameEn() {
+        return stopNameEn;
+    }
+
+    public String getStopNameTc() {
+        return stopNameTc;
     }
 
     @Override

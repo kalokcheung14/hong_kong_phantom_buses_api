@@ -20,7 +20,7 @@ public class MainController {
     private BusDataService busDataService;
 
     @GetMapping("/eta")
-    public List<EtaResponse> getEta(@RequestParam("coordinate") String coordinate) throws ParseException {
+    public EtaResponse getEta(@RequestParam("coordinate") String coordinate) throws ParseException {
         // Split input coordinates by comer
         String[] coords = coordinate.split(",");
         // Convert to double

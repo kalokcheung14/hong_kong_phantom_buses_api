@@ -143,7 +143,8 @@ public class BusDataServiceImpl implements BusDataService {
                 etaBusRouteResponse.etaDetails().add(new EtaDetailsResponse(
                         getEtaInMinutes(date, stopEta),
                         stopEta.rmkEn(),
-                        stopEta.rmkTc()
+                        stopEta.rmkTc(),
+                        stopEta.rmkEn().equalsIgnoreCase("scheduled bus")
                 ));
             }
         }

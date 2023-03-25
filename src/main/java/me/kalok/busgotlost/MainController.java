@@ -5,12 +5,12 @@ import me.kalok.busgotlost.model.Coordinate;
 import me.kalok.busgotlost.model.EtaResponse;
 import me.kalok.busgotlost.service.BusDataService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
-import java.util.List;
 import java.util.logging.Logger;
 
 @RestController
@@ -19,6 +19,7 @@ public class MainController {
     @Autowired
     private BusDataService busDataService;
 
+    @CrossOrigin(origins = "http://localhost:8080")
     @GetMapping("/eta")
     public EtaResponse getEta(@RequestParam("coordinate") String coordinate) throws ParseException {
         // Split input coordinates by comer

@@ -7,6 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,5 +34,17 @@ public class BusGotLostApplication {
 		messageConverters.add(converter);
 		restTemplate.setMessageConverters(messageConverters);
 		return restTemplate;
+	}
+
+	@Bean
+	public WebMvcConfigurer corsMappingConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**")
+						.allowedOrigins("http://localhost:8080")
+						.allowedMethods("GET");
+			}
+		};
 	}
 }

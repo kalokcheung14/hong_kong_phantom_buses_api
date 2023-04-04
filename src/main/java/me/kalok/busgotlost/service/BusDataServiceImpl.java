@@ -170,6 +170,11 @@ public class BusDataServiceImpl implements BusDataService {
                         DateTimeFormatter.ISO_DATE_TIME
                     )
                 ).toMinutes();
+
+            // Handle negative case
+            if (etaResult < 0) {
+                etaResult = 0L;
+            }
         }
         return etaResult;
     }

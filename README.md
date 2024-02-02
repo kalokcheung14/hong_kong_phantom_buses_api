@@ -1,4 +1,4 @@
-# bus_got_lost
+# Hong Kong Phantom Buses API
 
 This is an API built from Spring Boot to make use of API endpoints provided by the Hong Kong Government to grab and format the Estimated Time of Arrivals (ETA) of buses for different bus routes at the nearest stop to the location provided.
 

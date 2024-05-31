@@ -7,3 +7,5 @@ I recently got involved in a Spring Boot training at the company I am working at
 The concept is simple: the API receives a pair of geolocation (latitude, longitude) and find the nearest bus stop to that location. Then it provides the ETA of all the bus routes at that bus stop. The project is still on going as the return data of bus stops are more complicated than I thought. Despite its flaws in getting all the routes, it is still fully functional.
 
 The ETA API: https://data.gov.hk/en-data/dataset/hk-td-tis_21-etakmb
+
+The User Inferface created for processing the data: https://github.com/kalokcheung14/hong_kong_phantom_buses

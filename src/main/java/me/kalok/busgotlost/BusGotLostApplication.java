@@ -1,5 +1,6 @@
 package me.kalok.busgotlost;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +17,9 @@ import java.util.List;
 
 @SpringBootApplication
 public class BusGotLostApplication {
+
+	@Value("${api.frontend}")
+	String frontendUrl;
 
 	public static void main(String[] args) {
 		SpringApplication.run(BusGotLostApplication.class, args);
@@ -42,7 +46,7 @@ public class BusGotLostApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
-						.allowedOrigins("http://localhost:3000")
+						.allowedOrigins(frontendUrl)
 						.allowedMethods("GET");
 			}
 		};

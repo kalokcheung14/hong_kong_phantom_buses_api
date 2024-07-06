@@ -9,8 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>me.kalok.busgotlost</groupId>
-	<artifactId>demo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>phantom-buses</artifactId>
+	<version>0.1.0</version>
 	<name>Bus Got Lost</name>
 	<description> Spring Boot project to apply Hong Kong Bus ETA API</description>
 	<properties>

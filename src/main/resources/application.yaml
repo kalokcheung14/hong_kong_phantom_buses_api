@@ -6,4 +6,5 @@ server:
     path: /error
 api:
   url: https://data.etabus.gov.hk/
+  frontend: http://localhost:3000
   numOfStopsToDisplay: 3
